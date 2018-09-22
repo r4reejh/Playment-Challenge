@@ -62,6 +62,13 @@ func printMap(folder *Folder, spaces int) {
 	}
 }
 
+func printLS(folder *Folder) {
+	for _, v := range folder.Folder {
+		fmt.Print(v.Name + " ")
+	}
+	fmt.Println()
+}
+
 func deleteEmpty(s []string) []string {
 	var r []string
 	for _, str := range s {
@@ -80,7 +87,7 @@ func directoryExist(path string) *Folder {
 		paths = paths[1:len(paths)]
 	}
 	currPath := rootDir
-	fmt.Println(paths)
+	//fmt.Println(paths)
 	for _, v := range paths {
 		if v == "../" {
 			currPath = BackMap[currPath]
@@ -91,6 +98,20 @@ func directoryExist(path string) *Folder {
 		}
 	}
 	return currPath
+}
+
+func deleteDirectory(folder *Folder) bool {
+	parent, ok := BackMap[folder]
+	if ok {
+		if cwd == folder {
+			cwd = parent
+		}
+		delete(BackMap, folder)
+		delete(parent.Folder, folder.Name)
+		folder = nil
+		return true
+	}
+	return false
 }
 
 func checkSuffix(path string) string {

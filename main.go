@@ -8,7 +8,6 @@ import (
 	"strings"
 )
 
-var currDir string
 var level int
 var rootDir *Folder
 var cwd *Folder

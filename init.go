@@ -25,8 +25,7 @@ func loadFileSystem(path string, info os.FileInfo, err error) error {
 		return nil
 	}
 	if info.IsDir() {
-		currDir = path
-		folder := &Folder{info.Name() + "/", make(map[string]*Folder), path}
+		folder := newFolder(info.Name()+"/", path)
 		name := info.Name() + "/"
 		addFolder(path, name, folder)
 	}

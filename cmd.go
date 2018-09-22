@@ -9,38 +9,56 @@ func processCommand(cmd string) {
 	args := strings.Fields(cmd)
 	switch arg := args[0]; arg {
 	case "cd":
-		path := checkSuffix(checkPrefix(args[1]))
-		fmt.Println("ss: " + path)
-		d := directoryExist(path)
-		if d != nil {
-			cwd = d
-			fmt.Println("SUCC: DIR CHANGED " + d.Path)
-		} else {
-			fmt.Println("ERR: DIR NOT FOUND")
+		if len(args) > 1 {
+			path := checkSuffix(checkPrefix(args[1]))
+			d := directoryExist(path)
+			if d != nil {
+				cwd = d
+				fmt.Println("SUCC: REACHED")
+			} else {
+				fmt.Println("ERR: INVALID PATH")
+			}
 		}
 	case "mkdir":
-		path := args[1]
-		pathSplit := strings.Split(path, "/")
-		name := pathSplit[len(pathSplit)-1]
-		path = checkSuffix(checkPrefix(path))
-		d := directoryExist(args[1])
-		if d != nil {
-			fmt.Println("ERROR: DIR EXISTS")
-		} else {
-			fmt.Println(path)
+		for i := 1; i < len(args); i++ {
+			path := args[i]
+			pathSplit := strings.Split(path, "/")
+			name := pathSplit[len(pathSplit)-1]
+			path = checkSuffix(checkPrefix(path))
+			d := directoryExist(path)
+			if d != nil {
+				fmt.Println("ERR: DIRECTORY ALREADY EXISTS")
+				return
+			}
 			addFolder(path, name, newFolder(checkSuffix(name), path))
-			fmt.Println("SUCC: DIR ADDED")
 		}
+		fmt.Println("SUCC: CREATED")
 	case "ls":
-		fmt.Println("DIRS:")
-		printMap(cwd, 0)
+		fmt.Print("DIRS: ")
+		//printMap(cwd, 0)
+		printLS(cwd)
 	case "pwd":
 		//fmt.Println("print working directory")
-		fmt.Print("PWD: ")
+		fmt.Print("PATH: ")
 		fmt.Println(cwd.Path)
+	case "rm":
+		if len(args) > 1 {
+			path := checkSuffix(checkPrefix(args[1]))
+			d := directoryExist(path)
+			if d != nil {
+				ok := deleteDirectory(d)
+				if ok {
+					fmt.Println("SUCC: DELETED")
+				} else {
+					fmt.Println("ERR")
+				}
+			} else {
+				fmt.Println("ERR: INVALID PATH")
+			}
+		}
 	case "session":
 		initFS()
-		fmt.Println("SUCC: SESSION CLEARED")
+		fmt.Println("SUCC: CLEARED: RESET TO ROOT")
 	default:
 		fmt.Println("ERR: CANNOT RECOGNIZE INPUT")
 	}
