@@ -25,8 +25,8 @@ func addFolder(path string, name string, folder *Folder) bool {
 		}
 	}
 
-	if currPath.Folder[name] == nil {
-		currPath.Folder[name] = folder
+	if currPath.Folder[checkSuffix(name)] == nil {
+		currPath.Folder[checkSuffix(name)] = folder
 		BackMap[folder] = currPath
 	}
 	return true
@@ -35,14 +35,16 @@ func addFolder(path string, name string, folder *Folder) bool {
 func addFolderForce(path string) bool {
 	paths := deleteEmpty(strings.SplitAfter(path, "/"))
 	currPath := rootDir
+	cumulativePaths := ""
 	for _, v := range paths {
+		cumulativePaths += strings.Trim(v, " ")
 		if currPath != nil && currPath.Folder[v] != nil {
 			currPath = currPath.Folder[v]
 		} else if currPath == nil {
-			rootDir = newFolder(v, path)
+			rootDir = newFolder(v, cumulativePaths)
 			currPath = rootDir
 		} else {
-			folder := newFolder(v, path)
+			folder := newFolder(v, cumulativePaths)
 			currPath.Folder[v] = folder
 			BackMap[folder] = currPath
 			currPath = currPath.Folder[v]
@@ -56,6 +58,7 @@ func printMap(folder *Folder, spaces int) {
 	fmt.Println(folder.Name)
 	for _, v := range folder.Folder {
 		printMap(v, spaces+1)
+		//fmt.Println(k)
 	}
 }
 
@@ -74,16 +77,32 @@ func directoryExist(path string) *Folder {
 	//fmt.Println(paths)
 	//name := paths[len(paths)-1]
 	if len(paths) > 1 {
-		paths = paths[1 : len(paths)-1]
+		paths = paths[1:len(paths)]
 	}
 	currPath := rootDir
-	//fmt.Println(paths)
+	fmt.Println(paths)
 	for _, v := range paths {
-		if currPath.Folder[v] != nil {
+		if v == "../" {
+			currPath = BackMap[currPath]
+		} else if currPath.Folder[v] != nil {
 			currPath = currPath.Folder[v]
 		} else {
 			return nil
 		}
 	}
-	return rootDir
+	return currPath
+}
+
+func checkSuffix(path string) string {
+	if !strings.HasSuffix(path, "/") {
+		path = path + "/"
+	}
+	return path
+}
+
+func checkPrefix(path string) string {
+	if !strings.HasPrefix(path, "/") {
+		path = checkSuffix(cwd.Path) + path
+	}
+	return path
 }

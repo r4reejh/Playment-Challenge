@@ -7,36 +7,40 @@ import (
 
 func processCommand(cmd string) {
 	args := strings.Fields(cmd)
-	//fmt.Println(args)
 	switch arg := args[0]; arg {
 	case "cd":
-		d := directoryExist(args[1])
+		path := checkSuffix(checkPrefix(args[1]))
+		fmt.Println("ss: " + path)
+		d := directoryExist(path)
 		if d != nil {
 			cwd = d
-			fmt.Println("SUCC: DIR CHANGED")
+			fmt.Println("SUCC: DIR CHANGED " + d.Path)
+		} else {
+			fmt.Println("ERR: DIR NOT FOUND")
 		}
 	case "mkdir":
 		path := args[1]
 		pathSplit := strings.Split(path, "/")
 		name := pathSplit[len(pathSplit)-1]
-		if !strings.HasPrefix(path, "/") {
-			path = cwd.Path + path
-		}
+		path = checkSuffix(checkPrefix(path))
 		d := directoryExist(args[1])
 		if d != nil {
 			fmt.Println("ERROR: DIR EXISTS")
 		} else {
-			addFolder(path, name, cwd)
+			fmt.Println(path)
+			addFolder(path, name, newFolder(checkSuffix(name), path))
 			fmt.Println("SUCC: DIR ADDED")
 		}
 	case "ls":
-		fmt.Println("show files and folders")
-		printMap(rootDir, 0)
+		fmt.Println("DIRS:")
+		printMap(cwd, 0)
 	case "pwd":
 		//fmt.Println("print working directory")
+		fmt.Print("PWD: ")
 		fmt.Println(cwd.Path)
 	case "session":
-		fmt.Println("clear current session")
+		initFS()
+		fmt.Println("SUCC: SESSION CLEARED")
 	default:
 		fmt.Println("ERR: CANNOT RECOGNIZE INPUT")
 	}

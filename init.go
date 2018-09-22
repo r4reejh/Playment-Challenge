@@ -4,7 +4,20 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 )
+
+func initFS() {
+	rootDir = nil
+	BackMap = make(map[*Folder]*Folder)
+	addFolderForce(initDir)
+	err := filepath.Walk(initDir, loadFileSystem)
+	if err != nil {
+		log.Fatal(err)
+	}
+	cwd = rootDir
+	return
+}
 
 func loadFileSystem(path string, info os.FileInfo, err error) error {
 	if err != nil {
