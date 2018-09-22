@@ -13,7 +13,7 @@ func loadFileSystem(path string, info os.FileInfo, err error) error {
 	}
 	if info.IsDir() {
 		currDir = path
-		folder := &Folder{info.Name() + "/", make(map[string]*Folder)}
+		folder := &Folder{info.Name() + "/", make(map[string]*Folder), path}
 		name := info.Name() + "/"
 		addFolder(path, name, folder)
 	}
@@ -23,8 +23,5 @@ func loadFileSystem(path string, info os.FileInfo, err error) error {
 func indentPrint(level int) {
 	for i := 0; i < level; i++ {
 		fmt.Print(" ")
-		/*if i == level-1 {
-			fmt.Print("/")
-		}*/
 	}
 }

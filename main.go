@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"log"
 	"os"
@@ -11,11 +12,13 @@ import (
 var currDir string
 var level int
 var rootDir *Folder
+var cwd *Folder
 
 // Folder struct type to store Folder heirarchy in tree
 type Folder struct {
 	Name   string
 	Folder map[string]*Folder
+	Path   string
 }
 
 // BackMap struct type to store immediate previous directory address
@@ -35,11 +38,14 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	cwd = rootDir
 	fmt.Println("filesystem loaded...")
 	fmt.Print("$ ")
 	for true {
 		var cmd string
-		fmt.Scanln(&cmd)
+		reader := bufio.NewReader(os.Stdin)
+		cmd, _ = reader.ReadString('\n')
+		processCommand(strings.TrimLeft(cmd, "\n"))
 		fmt.Print("$ ")
 	}
 	//printMap(rootDir, 0)

@@ -5,8 +5,8 @@ import (
 	"strings"
 )
 
-func newFolder(name string) *Folder {
-	return &Folder{name, make(map[string]*Folder)}
+func newFolder(name string, path string) *Folder {
+	return &Folder{name, make(map[string]*Folder), path}
 }
 
 func addFolder(path string, name string, folder *Folder) bool {
@@ -39,10 +39,10 @@ func addFolderForce(path string) bool {
 		if currPath != nil && currPath.Folder[v] != nil {
 			currPath = currPath.Folder[v]
 		} else if currPath == nil {
-			rootDir = newFolder(v)
+			rootDir = newFolder(v, path)
 			currPath = rootDir
 		} else {
-			folder := newFolder(v)
+			folder := newFolder(v, path)
 			currPath.Folder[v] = folder
 			BackMap[folder] = currPath
 			currPath = currPath.Folder[v]
@@ -67,4 +67,23 @@ func deleteEmpty(s []string) []string {
 		}
 	}
 	return r
+}
+
+func directoryExist(path string) *Folder {
+	paths := deleteEmpty(strings.SplitAfter(path, "/"))
+	//fmt.Println(paths)
+	//name := paths[len(paths)-1]
+	if len(paths) > 1 {
+		paths = paths[1 : len(paths)-1]
+	}
+	currPath := rootDir
+	//fmt.Println(paths)
+	for _, v := range paths {
+		if currPath.Folder[v] != nil {
+			currPath = currPath.Folder[v]
+		} else {
+			return nil
+		}
+	}
+	return rootDir
 }
