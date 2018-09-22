@@ -1,17 +1,36 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 )
 
+// function for loading the filesystem from the directory specified in initDir
 func initFS() {
+
+	initDir = "/home/"
 	rootDir = nil
 	BackMap = make(map[*Folder]*Folder)
+
+	// Utility function to add the initial root directory to tree
 	addFolderForce(initDir)
-	err := filepath.Walk(initDir, loadFileSystem)
+
+	// Walking the directories to load them into a tree
+	err := filepath.Walk(initDir,
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				log.Print(err)
+				return nil
+			}
+			if info.IsDir() {
+				folder := newFolder(info.Name()+"/", path)
+				name := info.Name() + "/"
+				addFolder(path, name, folder)
+			}
+			return nil
+		})
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -19,21 +38,12 @@ func initFS() {
 	return
 }
 
-func loadFileSystem(path string, info os.FileInfo, err error) error {
-	if err != nil {
-		log.Print(err)
-		return nil
-	}
-	if info.IsDir() {
-		folder := newFolder(info.Name()+"/", path)
-		name := info.Name() + "/"
-		addFolder(path, name, folder)
-	}
-	return nil
-}
+// function to initialize the commands
+func initCommands() {
 
-func indentPrint(level int) {
-	for i := 0; i < level; i++ {
-		fmt.Print(" ")
-	}
+	CommandMap = make(map[string]*Command)
+
+	//creating Command variables on runtime, new additions can be easily made here
+	createCommands()
+
 }

@@ -1,15 +1,17 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 )
 
+// utility function to create new instances of Folder
 func newFolder(name string, path string) *Folder {
 	return &Folder{name, make(map[string]*Folder), path}
 }
 
+// adding folder from absolute path
 func addFolder(path string, name string, folder *Folder) bool {
+
 	paths := deleteEmpty(strings.SplitAfter(path, "/"))
 	//name := paths[len(paths)-1]
 	if len(paths) > 1 {
@@ -32,7 +34,9 @@ func addFolder(path string, name string, folder *Folder) bool {
 	return true
 }
 
+// force adding folder, similar to `mkdir -p` command
 func addFolderForce(path string) bool {
+
 	paths := deleteEmpty(strings.SplitAfter(path, "/"))
 	currPath := rootDir
 	cumulativePaths := ""
@@ -51,25 +55,12 @@ func addFolderForce(path string) bool {
 		}
 	}
 	return true
+
 }
 
-func printMap(folder *Folder, spaces int) {
-	indentPrint(spaces)
-	fmt.Println(folder.Name)
-	for _, v := range folder.Folder {
-		printMap(v, spaces+1)
-		//fmt.Println(k)
-	}
-}
-
-func printLS(folder *Folder) {
-	for _, v := range folder.Folder {
-		fmt.Print(v.Name + " ")
-	}
-	fmt.Println()
-}
-
+// deleting empty values from slice
 func deleteEmpty(s []string) []string {
+
 	var r []string
 	for _, str := range s {
 		if str != "" {
@@ -77,17 +68,17 @@ func deleteEmpty(s []string) []string {
 		}
 	}
 	return r
+
 }
 
+// check if directory exists for absolute path, return address if exists
 func directoryExist(path string) *Folder {
+
 	paths := deleteEmpty(strings.SplitAfter(path, "/"))
-	//fmt.Println(paths)
-	//name := paths[len(paths)-1]
 	if len(paths) > 1 {
 		paths = paths[1:len(paths)]
 	}
 	currPath := rootDir
-	//fmt.Println(paths)
 	for _, v := range paths {
 		if v == "../" {
 			currPath = BackMap[currPath]
@@ -98,30 +89,21 @@ func directoryExist(path string) *Folder {
 		}
 	}
 	return currPath
+
 }
 
-func deleteDirectory(folder *Folder) bool {
-	parent, ok := BackMap[folder]
-	if ok {
-		if cwd == folder {
-			cwd = parent
-		}
-		delete(BackMap, folder)
-		delete(parent.Folder, folder.Name)
-		folder = nil
-		return true
-	}
-	return false
-}
-
+// appending trailing `/`
 func checkSuffix(path string) string {
+
 	if !strings.HasSuffix(path, "/") {
 		path = path + "/"
 	}
 	return path
 }
 
+// prepending current working directory in case of relative path as input to generate absilute path
 func checkPrefix(path string) string {
+
 	if !strings.HasPrefix(path, "/") {
 		path = checkSuffix(cwd.Path) + path
 	}
