@@ -80,7 +80,9 @@ func directoryExist(path string) *Folder {
 	}
 	currPath := rootDir
 	for _, v := range paths {
-		if v == "../" {
+		if v == "/" {
+			return currPath
+		} else if v == "../" {
 			currPath = BackMap[currPath]
 		} else if currPath.Folder[v] != nil {
 			currPath = currPath.Folder[v]
@@ -106,6 +108,22 @@ func checkPrefix(path string) string {
 
 	if !strings.HasPrefix(path, "/") {
 		path = checkSuffix(cwd.Path) + path
+	}
+	return path
+}
+
+// remove suffix
+func removeSuffix(path string) string {
+	if len(path) > 1 && strings.HasSuffix(path, "/") {
+		path = path[0 : len(path)-1]
+	}
+	return path
+}
+
+// remove prefix
+func removePrefix(path string) string {
+	if len(path) > 1 && strings.HasPrefix(path, "/") {
+		path = path[1:len(path)]
 	}
 	return path
 }

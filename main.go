@@ -12,16 +12,19 @@ var cwd *Folder
 var initDir string
 
 func main() {
-	fmt.Println("loading application...")
+	fmt.Println("$> <Starting your application...>")
 	initFS()
 	initCommands()
-	fmt.Println("filesystem loaded...")
-	fmt.Print("$ ")
+	fmt.Print("$> ")
 	for true {
 		var cmd string
 		reader := bufio.NewReader(os.Stdin)
 		cmd, _ = reader.ReadString('\n')
-		processCommand(strings.TrimLeft(cmd, "\n"))
-		fmt.Print("$ ")
+		if string(strings.TrimRight(cmd, "\n")) == "exit" {
+			fmt.Println("Bye!")
+			return
+		}
+		processCommand(strings.TrimRight(cmd, "\n"))
+		fmt.Print("$> ")
 	}
 }

@@ -16,7 +16,7 @@ var BackMap map[*Folder]*Folder
 func (folder *Folder) returnLS() string {
 	out := ""
 	for _, v := range folder.Folder {
-		out += v.Name + " "
+		out += removePrefix(removeSuffix(v.Name)) + " "
 	}
 	return out
 }

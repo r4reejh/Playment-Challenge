@@ -49,7 +49,7 @@ func processCommandTest(cmd string) string {
 		}
 		return ""
 	}
-	return "ERR: CANNOT RECOGNIZE INPUT"
+	return "ERR: CANNOT RECOGNIZE INPUT."
 }
 
 // function to create the predefined commands, more commands can be created easily later
@@ -70,6 +70,7 @@ func createCommands() {
 	})
 
 	newCommand("mkdir", func(args []string) string {
+		out := ""
 		for i := 1; i < len(args); i++ {
 			path := args[i]
 			pathSplit := strings.Split(path, "/")
@@ -77,9 +78,15 @@ func createCommands() {
 			path = checkSuffix(checkPrefix(path))
 			d := directoryExist(path)
 			if d != nil {
-				return "ERR: DIRECTORY ALREADY EXISTS"
+				out = "ERR: DIRECTORY ALREADY EXISTS"
 			}
-			addFolder(path, name, newFolder(checkSuffix(name), path))
+			ok := addFolder(path, name, newFolder(checkSuffix(name), path))
+			if !ok {
+				out = "ERR: INVALID PATH"
+			}
+		}
+		if out != "" {
+			return out
 		}
 		if len(args) > 1 {
 			return "SUCC: CREATED"
@@ -92,12 +99,13 @@ func createCommands() {
 	})
 
 	newCommand("pwd", func(args []string) string {
-		return "PATH: " + cwd.Path
+		return "PATH: " + removeSuffix(cwd.Path)
 	})
 
 	newCommand("rm", func(args []string) string {
+		out := ""
 		for i := 1; i < len(args); i++ {
-			path := checkSuffix(checkPrefix(args[1]))
+			path := checkSuffix(checkPrefix(args[i]))
 			d := directoryExist(path)
 			if d != nil {
 				ok := d.deleteDirectory()
@@ -105,8 +113,11 @@ func createCommands() {
 					return "ERR"
 				}
 			} else {
-				return "ERR: INVALID PATH"
+				out = "ERR: INVALID PATH"
 			}
+		}
+		if out != "" {
+			return out
 		}
 		if len(args) > 1 {
 			return "SUCC: DELETED"
@@ -115,7 +126,11 @@ func createCommands() {
 	})
 
 	newCommand("session", func(args []string) string {
-		initFS()
-		return "SUCC: CLEARED: RESET TO ROOT"
+		if len(args) > 1 && args[1] == "clear" {
+			initFS()
+			return "SUCC: CLEARED: RESET TO ROOT"
+		} else {
+			return ""
+		}
 	})
 }
